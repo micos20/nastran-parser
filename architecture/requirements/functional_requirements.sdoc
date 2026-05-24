@@ -1,0 +1,215 @@
+[DOCUMENT]
+MID: c7decfcff3d6484685a36511f1a81f63
+TITLE: Functional Requirements
+PREFIX: FR-
+OPTIONS:
+  ENABLE_MID: True
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @grammar
+
+[REQUIREMENT]
+MID: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+UID: FR-1
+TITLE: Read BDF from filesystem
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall read BDF input files from the local filesystem as a data stream.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A BDF file on the local filesystem can be opened and its content streamed card by card
+through the pipeline. The file is not fully loaded into memory at any point.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a FileSystemSource class that opens files using Python buffered I/O and yields
+card-aligned chunks on demand via the iterator protocol.
+<<<
+
+[REQUIREMENT]
+MID: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7
+UID: FR-2
+TITLE: Read BDF from network
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall read BDF input from a URL or REST endpoint as a data stream.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A BDF file served over HTTP can be streamed through the pipeline without downloading
+the complete file first. The source yields data as the network delivers it.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a NetworkSource class using an HTTP client with streaming enabled (e.g.
+httpx with stream=True), yielding card-aligned chunks as they arrive.
+<<<
+
+[REQUIREMENT]
+MID: c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8
+UID: FR-3
+TITLE: Interpret NASTRAN card stream
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall parse and validate NASTRAN card content from a chunked data stream,
+identifying card type, extracting field values, and validating field types.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+Given a stream of BDF content, the interpreter correctly identifies all card types,
+extracts every field value, and rejects fields whose values do not match the declared
+type (Integer, Real, or Character). Continuation lines are assembled into a single card.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a card interpreter that detects small-field, large-field, and free-field
+formats per card. Use card definitions to extract and type-validate each field.
+Accumulate continuation lines before dispatching the completed card downstream.
+<<<
+
+[REQUIREMENT]
+MID: d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
+UID: FR-4
+TITLE: Modify card field values
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall allow modification of individual field values on a parsed NASTRAN card.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A field value on a parsed card can be updated programmatically. The change is reflected
+when the card is subsequently serialized. Assignment of a value with an incompatible
+type raises a descriptive error.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Expose mutable field attributes on each typed card class. Validate the new value against
+the field type constraint on assignment and raise a TypeError with the field name and
+expected type if the constraint is violated.
+<<<
+
+[REQUIREMENT]
+MID: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+UID: FR-5
+TITLE: Write BDF to filesystem
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall serialize and write BDF output to the local filesystem.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A sequence of card objects can be serialized to a file. The resulting BDF file is
+parseable as valid input by the same parser without errors or data loss.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a FileSystemSink class that serializes each card back to its original format
+(small-field, large-field, or free-field) and writes to a file using buffered I/O,
+flushing on completion.
+<<<
+
+[REQUIREMENT]
+MID: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1
+UID: FR-6
+TITLE: Write BDF to network
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall serialize and stream BDF output to a URL or REST endpoint.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A sequence of card objects can be serialized and sent to an HTTP endpoint without
+buffering the complete output in memory. The endpoint receives valid BDF content.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a NetworkSink class that streams serialized card data to a URL via HTTP using
+chunked transfer encoding, writing each card as it is received from the upstream stage.
+<<<
+
+[REQUIREMENT]
+MID: a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+UID: FR-7
+TITLE: Track file content summary
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall record the card type and card ID for every card encountered during
+stream processing and return a file summary upon stream completion.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+After processing a BDF stream, the returned FileSummary lists every distinct card type
+encountered, the total count per type, and the ID of each individual card. The summary
+is correct even when the stream is processed in a single pass without re-reading.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Accumulate a FileSummary data structure during stream processing. Each interpreted card
+contributes its type and ID to the summary before being forwarded to the next stage.
+Return the completed summary when the stream is exhausted.
+<<<
+
+[REQUIREMENT]
+MID: b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3
+UID: FR-8
+TITLE: Chunked stream processing
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall process BDF input in chunks without loading the complete file into memory.
+The chunk boundary shall align to card boundaries (not byte offsets).
+<<<
+ACCEPTANCE_CRITERIA: >>>
+Processing a BDF file larger than available RAM completes successfully. Peak memory usage
+measured by a memory profiler does not grow proportionally with file size.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement the processing pipeline as a Python generator chain. Each stage yields one
+card at a time and holds no references to previously yielded cards. Chunk boundaries
+are determined by detecting the end of a complete card (including continuation lines).
+<<<
+
+[REQUIREMENT]
+MID: c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4
+UID: FR-9
+TITLE: Task-based pipeline configuration
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall configure the processing pipeline via a task type supplied by the caller
+at the start of a stream (e.g. read-only, renumber).
+<<<
+ACCEPTANCE_CRITERIA: >>>
+The same pipeline infrastructure executes a read-only task and a renumber task when
+supplied with the respective task descriptor, without any code change between runs.
+Different task types produce the correct sequence of pipeline stages.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a pipeline factory that assembles the ordered list of stages based on the
+supplied task descriptor before the stream is opened. Each task type maps to a fixed
+stage composition defined in the factory.
+<<<
+
+[REQUIREMENT]
+MID: d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5
+UID: FR-10
+TITLE: Renumber card IDs
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall renumber card IDs according to a caller-supplied ruleset during stream
+processing, generating new IDs from defined number ranges.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+Given a renumbering ruleset, all card IDs in the output BDF fall within the specified
+target ranges. IDs that cross-reference other cards are updated consistently so the
+output BDF remains internally coherent.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement a RenumberStage that loads the ruleset, maintains a counter per target range,
+and maps each original ID to the next available ID in the corresponding range. Apply
+the mapping to all ID fields of each card before forwarding it downstream.
+<<<
+
+[REQUIREMENT]
+MID: e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6
+UID: FR-11
+TITLE: ID mapping table
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall maintain a lookup table mapping old card IDs to new card IDs during
+renumbering, returned as part of the file summary on stream completion.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+The FileSummary returned after a renumber operation contains a complete mapping of every
+original card ID to its assigned new ID. The mapping covers all card types that carry IDs.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Maintain a dictionary in RenumberStage keyed by original ID and updated as each card
+is processed. Include the completed mapping in the FileSummary returned on stream
+completion.
+<<<

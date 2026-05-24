@@ -1,0 +1,45 @@
+[GRAMMAR]
+ELEMENTS:
+- TAG: REQUIREMENT
+  FIELDS:
+  - TITLE: MID
+    TYPE: String
+    REQUIRED: True
+  - TITLE: UID
+    TYPE: String
+    REQUIRED: True
+  - TITLE: TITLE
+    TYPE: String
+    REQUIRED: True
+  - TITLE: STATUS
+    TYPE: SingleChoice(DRAFT, IN_WORK, ACCEPTED, IMPLEMENTED)
+    REQUIRED: True
+  - TITLE: SEVERITY
+    TYPE: SingleChoice(LOW, MEDIUM, HIGH, CRITICAL)
+    REQUIRED: False
+  - TITLE: OBLIGATION
+    TYPE: SingleChoice(SHALL_NOT, SHOULD_NOT, MAY, SHOULD, SHALL)
+    REQUIRED: False
+  - TITLE: TAGS
+    TYPE: Tag
+    REQUIRED: False
+  - TITLE: STATEMENT
+    TYPE: String
+    REQUIRED: True
+  - TITLE: ACCEPTANCE_CRITERIA
+    TYPE: String
+    REQUIRED: True
+  - TITLE: MEANS_OF_COMPLIANCE
+    TYPE: String
+    REQUIRED: True
+  - TITLE: EXTERNAL_REFERENCES
+    TYPE: String
+    REQUIRED: False
+  - TITLE: COMMENT
+    TYPE: String
+    REQUIRED: False
+  RELATIONS:
+  - TYPE: Parent
+  - TYPE: Parent
+    ROLE: Refines
+  - TYPE: File

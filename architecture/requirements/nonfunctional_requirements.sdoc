@@ -1,0 +1,110 @@
+[DOCUMENT]
+MID: f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2
+TITLE: Non-Functional Requirements
+PREFIX: NFR-
+OPTIONS:
+  ENABLE_MID: True
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @grammar
+
+[REQUIREMENT]
+MID: a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3
+UID: NFR-1
+TITLE: Processing performance
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall process BDF streams with minimal CPU overhead, enabling handling of
+large models without significant impact on overall execution time.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A 100 MB BDF file is fully processed (read, interpreted, summary returned) in under
+10 seconds on a modern laptop running Python 3.12. CPU utilisation during processing
+does not exceed single-core capacity on the hot path.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Use Python generator pipelines to eliminate intermediate allocations. Profile critical
+parsing paths and apply targeted optimisations such as compiled regex patterns and
+struct-based unpacking for fixed-width fields.
+<<<
+
+[REQUIREMENT]
+MID: b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4
+UID: NFR-2
+TITLE: Memory efficiency
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall maintain a minimal memory footprint during stream processing,
+avoiding accumulation of data beyond what is required for the current processing step.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+Peak memory usage measured by a memory profiler while processing a 1 GB BDF file does
+not exceed a configurable budget (default 128 MB). Memory usage does not grow
+proportionally with file size.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Implement the pipeline as a generator chain so no stage holds references to previously
+yielded cards. Use __slots__ on card classes to minimise per-object overhead. Release
+references to completed cards immediately after they are forwarded downstream.
+<<<
+
+[REQUIREMENT]
+MID: c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5
+UID: NFR-3
+TITLE: Adaptive memory consumption
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall dynamically adjust its memory consumption in response to the rate
+and volume of incoming data, preventing unbounded memory growth.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+When a downstream stage processes cards more slowly than the source produces them,
+the source reads no further ahead than one configured buffer. Memory usage under
+back-pressure remains bounded and does not increase over time.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Leverage Python generator back-pressure: the source only advances to the next chunk
+when the downstream consumer calls next() on the iterator. No intermediate buffer or
+queue is inserted between stages unless explicitly configured.
+<<<
+
+[REQUIREMENT]
+MID: d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6
+UID: NFR-4
+TITLE: Modularity
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall support the addition of new processing pipeline stages without
+requiring modification of existing stages or the core stream infrastructure.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+A new pipeline stage can be implemented, registered, and wired into a workflow by
+adding a single class and a task descriptor entry, with no changes to existing stage
+classes or the pipeline runner. Existing workflows continue to pass their tests.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Define a PipelineStage abstract base class (or Protocol) with a standard
+process(cards: Iterator[Card]) -> Iterator[Card] interface. The pipeline factory
+assembles stages by composition based on the task descriptor, with no hard-coded
+stage references in the runner.
+<<<
+
+[REQUIREMENT]
+MID: e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7
+UID: NFR-5
+TITLE: PyPI distribution
+STATUS: DRAFT
+STATEMENT: >>>
+The system shall be published as a Python package on PyPI and be installable via
+pip or uv without additional build steps.
+<<<
+ACCEPTANCE_CRITERIA: >>>
+pip install nastran-parser succeeds on Python 3.12+ on Windows, macOS, and Linux
+without requiring a compiler or any system-level dependencies. The installed package
+is importable immediately after installation.
+<<<
+MEANS_OF_COMPLIANCE: >>>
+Maintain a pure-Python implementation with no C extensions or compiled dependencies.
+Use uv build to produce a wheel and sdist, and uv publish to upload to PyPI. Automate
+publishing via CI on tagged releases.
+<<<
