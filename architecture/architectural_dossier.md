@@ -81,17 +81,15 @@ boundary and the external producers/consumers that connect to it.
 
 Pipeline stages (inside nastran-parser boundary):
 
-- **Interpreter filter** — assembles raw text lines into complete cards and instantiates typed card models
-- **Summary stage** — transparent pass-through that accumulates the file summary
-- **Renumberer filter** — remaps card IDs (renumber task only)
-- **Exporter filter** — serialises card models back to BDF text lines
+- **Interpreter** — assembles raw text lines into complete cards and instantiates typed card models
+- **Analyzer** — transparent pass-through that accumulates the file summary
+- **Renumberer** — remaps card IDs (renumber task only)
+- **Exporter** — serialises card models back to BDF text lines
 
 > **Note on Validator tester:** The original Excalidraw diagram shows a separate "Validator tester"
 > stage. Based on the architectural decision to use Pydantic models, validation (type coercion,
 > required-field checks, value constraints) is embedded inside the Interpreter at model-construction
 > time. There is no separate runtime stage. The Excalidraw source should be updated to reflect this.
-
-*Source: [architecture/diagrams/logical_design.excalidraw](diagrams/logical_design.excalidraw)*
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'clusterBkg': '#ffffff', 'clusterBorder': '#000000', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
@@ -100,10 +98,10 @@ flowchart TD
     NS["NetworkSource"]
 
     subgraph np["nastran-parser"]
-        IF["InterpreterFilter"]
-        SS["SummaryStage"]
-        RF["RenumbererFilter\n(renumber task only)"]:::opt
-        EF["ExporterFilter"]
+        IF["Interpreter"]
+        SS["Analyzer"]
+        RF["Renumberer\n(renumber task only)"]:::opt
+        EF["Exporter"]
     end
 
     FSink["FileSystemSink"]
@@ -124,23 +122,37 @@ flowchart TD
 
 ## Functional Breakdown
 
-### Module responsibility mapping
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'clusterBkg': '#ffffff', 'clusterBorder': '#000000', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
+flowchart TD
+    NP["nastran-parser"]
 
-| Module | Purpose | Actor/Actions | Workflow steps | FRs |
-|--------|---------|---------------|----------------|-----|
-| `FileSystemSource` | Open a local BDF file; yield decoded text lines via generator | 1 | Accept stream (Stage 1) | FR-1 |
-| `NetworkSource` | Open a URL/REST endpoint; yield decoded text lines via generator | 2 | Accept stream (Stage 1) | FR-2 |
-| `PipelineFactory` | Accept task type + source; assemble ordered stage chain; return `(card_iterator, FileSummary)` | — | Determine task type; load ruleset; wire stages | FR-9 |
-| `InterpreterFilter` | Assemble lines into complete cards incl. continuations; detect format; parse fields; instantiate typed Pydantic card model (validation embedded) | 3, 4 | Identify format; extract fields; validate; assign to model (Stage 2) | FR-3, FR-8 |
-| `SummaryStage` | Transparent pass-through; records card type and ID into `FileSummary`; holds no card references after forwarding | 8 | Record card type + ID | FR-7 |
-| `RenumbererFilter` | Map each card ID to next available ID in target range; update card field; record old→new mapping in `FileSummary` | — | Extract ID; generate new ID; record mapping; update card (Workflow 2, Stage 3) | FR-10, FR-11 |
-| `ExporterFilter` | Convert each card model to BDF-formatted text lines; unknown card types pass through unchanged | — | Serialize card (Stage 4) | FR-5, FR-6 (serialisation) |
-| `FileSystemSink` | Write text lines from ExporterFilter to a local file | 6 | Write to target (Stage 4) | FR-5 (I/O) |
-| `NetworkSink` | Stream text lines from ExporterFilter to an HTTP endpoint via chunked transfer encoding | 7 | Stream to target (Stage 4) | FR-6 (I/O) |
-| Card models (`Grid`, `Cquad4`, …) | Typed Pydantic models; one per card type; field mutation via direct attribute assignment, validated by Pydantic | 5 | — | FR-4 |
-| `FileSummary` | Accumulates card type counts, individual card IDs, and (renumber only) old→new ID mapping during stream processing | 8 | Return summary on stream completion | FR-7, FR-11 |
+    INT["interpreter"]
+    ANL["analyzer"]
+    RNB["renumberer"]
+    EXP["exporter"]
 
-*A component diagram (Excalidraw) will be added to `architecture/diagrams/` to visualise these relationships graphically.*
+    NP --> INT & ANL & RNB & EXP
+
+    INT --> INT1["assemble raw text lines\ninto complete cards"]
+    INT --> INT2["detect card format\n(small / large / free-field)"]
+    INT --> INT3["instantiate typed card models\n(field extraction + type validation)"]
+
+    ANL --> ANL1["count cards by type"]
+    ANL --> ANL2["determine numbering ranges\nper card type"]
+    ANL --> ANL3["prepare file summary"]
+
+    RNB --> RNB1["assign new numbering ranges\nbased on ruleset"]
+    RNB --> RNB2["update card ID field"]
+    RNB --> RNB3["populate old→new\nID lookup table"]
+
+    EXP --> EXP1["serialise card models\nback to BDF text lines"]
+    EXP --> EXP2["pass through\nunknown card types unchanged"]
+```
+
+> The **analyzer** runs on every BDF read. It profiles the file — counting cards and recording
+> the ID ranges currently in use per card type — so the `FileSummary` is complete and usable
+> as-is for a read-only task or as input to a subsequent renumber operation.
 
 ---
 
