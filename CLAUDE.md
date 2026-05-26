@@ -53,35 +53,15 @@ mypy src/                  # strict type checking — errors should be fixed; ne
 
 These are quality gates, not blockers for exploratory branches.
 
-## NASTRAN 2025.1 Quick Reference Guide (QRG)
+## NASTRAN card reference
 
-Before using the following url please use the reference documents in the nastran-card-structure SKILL.
-A reduced version of this file containing only the BULK DATA ENTRIES can also found in the skill references.
+Use the `nastran-card-structure` skill for all card lookups. It contains:
 
-**URL:** https://nexus.hexagon.com/documentationcenter/en-US/bundle/MSC_Nastran_2025.1_Quick_Reference_Guide/resource/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf
+- Bulk Data format rules (small/large/free-field, field types, continuation lines)
+- A card dependency map (element → property → material chains)
+- Pre-extracted summaries for 34 cards in `references/cards/*.md`
+- A local Bulk Data PDF (`references/QRG-BULKDATA.pdf`) as fallback for unlisted cards — ask before reading it (high token cost)
 
-### Purpose
-The QRG is the authoritative source for card definitions. Fetch it with WebFetch when you need to look up a specific card. Each card section contains:
+**Which cards to implement:** specified as requirements in `architecture/requirements/`. Do not implement a card without a corresponding `FR-` UID.
 
-- **Description** — what the card does
-- **Format** — fixed-field (small/large) or free-field layout
-- **Fields table** — field position, name, type (Integer/Real/Character), default, constraints
-
-### Which cards to implement
-Cards to implement are specified as requirements in `architecture/requirements/`. Do not implement a card without a corresponding `FR-` UID.
-
-### How to extract card information from the QRG
-
-1. Fetch the PDF from the URL above (use WebFetch).
-2. Search for the card name (e.g. `GRID`, `CBAR`, `MAT1`) — cards are alphabetical within sections.
-3. Locate the **Format** subsection — column layout:
-   - Small field: 10 fields × 8 characters per line
-   - Large field: 5 fields × 16 characters per line (card name ends with `*`)
-   - Free field: comma-separated values
-4. Locate the **Fields** table — each row: field position, name, type, default, constraints.
-5. Record this structure in the corresponding requirement `STATEMENT` block.
-
-### QRG navigation notes
-- nastran-parser targets **Bulk Data** cards only unless a requirement explicitly specifies otherwise.
-- Some cards span continuation lines (field 1 = `+` or blank for small field; `*` for large field) — track these during parsing.
-- Sections: Bulk Data → alphabetical by card name.
+nastran-parser targets **Bulk Data** cards only unless a requirement explicitly specifies otherwise.

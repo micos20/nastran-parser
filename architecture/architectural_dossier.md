@@ -76,13 +76,41 @@ Identified actors: **system only**
 
 ---
 
-## Functional Breakdown
+## Logical Design
 
-*Diagrams will be added as Excalidraw exports. Source files in `architecture/diagrams/`.*
+From the actor / actions lists we can derive the main software components.
+
+- Interpreter filter
+- Validator tester
+- Renumberer filter
+- Exporter filter
+
+*Source: [architecture/diagrams/logical_design.excalidraw](diagrams/logical_design.excalidraw)*
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'clusterBkg': '#ffffff', 'clusterBorder': '#000000', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
+flowchart TD
+    A["Producer data stream"]
+
+    subgraph nastran-parser
+        B["Interpreter filter"]
+        C["Validator tester"]
+        D["Renumberer filter"]
+        E["Exporter filter"]
+    end
+
+    F["Consumer data stream"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+```
 
 ---
 
-## Logical Design
+## Functional Breakdown
 
 *Diagrams will be added as Excalidraw exports. Source files in `architecture/diagrams/`.*
 
