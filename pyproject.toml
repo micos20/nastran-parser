@@ -3,7 +3,7 @@ name = "nastran-parser"
 version = "0.1.0"
 description = "Parse, mutate, and write NASTRAN BDF files"
 readme = "README.md"
-license = { text = "MIT" }
+license = { text = "Apache-2.0" }
 authors = [
     { name = "Michael Wrzos", email = "michael.wrzos@gmx.de" }
 ]
