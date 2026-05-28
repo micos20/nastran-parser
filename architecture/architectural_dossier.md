@@ -134,20 +134,20 @@ flowchart TD
 
     NP --> INT & ANL & RNB & EXP
 
-    INT --> INT1["assemble raw text lines\ninto complete cards"]
-    INT --> INT2["detect card format\n(small / large / free-field)"]
-    INT --> INT3["instantiate typed card models\n(field extraction + type validation)"]
+    INT --> INT1["INT-1  assemble raw text lines\ninto complete cards"]
+    INT --> INT2["INT-2  detect card format\n(small / large / free-field)"]
+    INT --> INT3["INT-3  instantiate typed card models\n(field extraction + type validation)"]
 
-    ANL --> ANL1["count cards by type"]
-    ANL --> ANL2["determine numbering ranges\nper card type"]
-    ANL --> ANL3["prepare file summary"]
+    ANL --> ANL1["ANL-1  count cards by type"]
+    ANL --> ANL2["ANL-2  determine numbering ranges\nper card type"]
+    ANL --> ANL3["ANL-3  prepare file summary"]
 
-    RNB --> RNB1["assign new numbering ranges\nbased on ruleset"]
-    RNB --> RNB2["update card ID field"]
-    RNB --> RNB3["populate old→new\nID lookup table"]
+    RNB --> RNB1["RNB-1  assign new numbering ranges\nbased on ruleset"]
+    RNB --> RNB2["RNB-2  update card ID field"]
+    RNB --> RNB3["RNB-3  populate old→new\nID lookup table"]
 
-    EXP --> EXP1["serialise card models\nback to BDF text lines"]
-    EXP --> EXP2["pass through\nunknown card types unchanged"]
+    EXP --> EXP1["EXP-1  serialise card models\nback to BDF text lines"]
+    EXP --> EXP2["EXP-2  pass through\nunknown card types unchanged"]
 ```
 
 > The **analyzer** runs on every BDF read. It profiles the file — counting cards and recording

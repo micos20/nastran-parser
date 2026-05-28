@@ -24,6 +24,7 @@ MEANS_OF_COMPLIANCE: >>>
 Implement a FileSystemSource class that opens files using Python buffered I/O and yields
 card-aligned chunks on demand via the iterator protocol.
 <<<
+FUNCTIONS: INT-1
 
 [REQUIREMENT]
 MID: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7
@@ -41,6 +42,7 @@ MEANS_OF_COMPLIANCE: >>>
 Implement a NetworkSource class using an HTTP client with streaming enabled (e.g.
 httpx with stream=True), yielding card-aligned chunks as they arrive.
 <<<
+FUNCTIONS: INT-1
 
 [REQUIREMENT]
 MID: c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8
@@ -61,6 +63,7 @@ Implement a card interpreter that detects small-field, large-field, and free-fie
 formats per card. Use card definitions to extract and type-validate each field.
 Accumulate continuation lines before dispatching the completed card downstream.
 <<<
+FUNCTIONS: INT-1, INT-2, INT-3
 
 [REQUIREMENT]
 MID: d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
@@ -80,6 +83,7 @@ Expose mutable field attributes on each typed card class. Validate the new value
 the field type constraint on assignment and raise a TypeError with the field name and
 expected type if the constraint is violated.
 <<<
+FUNCTIONS: INT-3
 
 [REQUIREMENT]
 MID: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
@@ -98,6 +102,7 @@ Implement a FileSystemSink class that serializes each card back to its original 
 (small-field, large-field, or free-field) and writes to a file using buffered I/O,
 flushing on completion.
 <<<
+FUNCTIONS: EXP-1, EXP-2
 
 [REQUIREMENT]
 MID: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1
@@ -115,6 +120,7 @@ MEANS_OF_COMPLIANCE: >>>
 Implement a NetworkSink class that streams serialized card data to a URL via HTTP using
 chunked transfer encoding, writing each card as it is received from the upstream stage.
 <<<
+FUNCTIONS: EXP-1, EXP-2
 
 [REQUIREMENT]
 MID: a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
@@ -135,6 +141,7 @@ Accumulate a FileSummary data structure during stream processing. Each interpret
 contributes its type and ID to the summary before being forwarded to the next stage.
 Return the completed summary when the stream is exhausted.
 <<<
+FUNCTIONS: ANL-1, ANL-2, ANL-3
 
 [REQUIREMENT]
 MID: b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3
@@ -154,6 +161,7 @@ Implement the processing pipeline as a Python generator chain. Each stage yields
 card at a time and holds no references to previously yielded cards. Chunk boundaries
 are determined by detecting the end of a complete card (including continuation lines).
 <<<
+FUNCTIONS: INT-1
 
 [REQUIREMENT]
 MID: c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4
@@ -194,6 +202,7 @@ Implement a RenumberStage that loads the ruleset, maintains a counter per target
 and maps each original ID to the next available ID in the corresponding range. Apply
 the mapping to all ID fields of each card before forwarding it downstream.
 <<<
+FUNCTIONS: RNB-1, RNB-2
 
 [REQUIREMENT]
 MID: e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6
@@ -213,3 +222,4 @@ Maintain a dictionary in RenumberStage keyed by original ID and updated as each 
 is processed. Include the completed mapping in the FileSummary returned on stream
 completion.
 <<<
+FUNCTIONS: RNB-3

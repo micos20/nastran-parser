@@ -31,10 +31,19 @@ nastran-parser/
 
 ## Working with diagrams
 
-Diagrams are authored in Excalidraw (source files in `architecture/diagrams/`) and exported as Mermaid, then embedded directly in `architecture/architectural_dossier.md`.
-Use fenced Mermaid blocks: ` ```mermaid ... ``` `
+Mermaid diagrams are embedded directly in `architecture/architectural_dossier.md`
+using fenced ` ```mermaid ... ``` ` blocks. These are the authoritative diagrams.
+Excalidraw files in `architecture/diagrams/` are used for sketching only and are
+not the source of truth.
 
 Do not edit Mermaid blocks manually unless correcting a rendering issue.
+
+### Module name consistency
+
+The **Logical Design** diagram and the **Functional Breakdown** diagram are related.
+The module names used in both diagrams must always be identical. Whenever a module
+name is added, removed, or renamed in one diagram, apply the same change to the other
+diagram and the surrounding prose in the same commit.
 
 ## Testing standards
 
@@ -59,7 +68,7 @@ Use the `nastran-card-structure` skill for all card lookups. It contains:
 
 - Bulk Data format rules (small/large/free-field, field types, continuation lines)
 - A card dependency map (element → property → material chains)
-- Pre-extracted summaries for 34 cards in `references/cards/*.md`
+- Pre-extracted summaries for several nastran cards in `references/cards/*.md`
 - A local Bulk Data PDF (`references/QRG-BULKDATA.pdf`) as fallback for unlisted cards — ask before reading it (high token cost)
 
 **Which cards to implement:** specified as requirements in `architecture/requirements/`. Do not implement a card without a corresponding `FR-` UID.

@@ -35,6 +35,9 @@ ELEMENTS:
   - TITLE: EXTERNAL_REFERENCES
     TYPE: String
     REQUIRED: False
+  - TITLE: FUNCTIONS
+    TYPE: String
+    REQUIRED: False
   - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
