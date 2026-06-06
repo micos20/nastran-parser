@@ -111,13 +111,9 @@ Pipeline stages (inside nastran-parser boundary):
 
 ## Requirements
 
-Requirements are maintained in `architecture/requirements/` using StrictDoc.
-The static HTML export is committed at `architecture/requirements-html/html/` and
-regenerates automatically whenever Claude edits a `.sdoc` file (PostToolUse hook).
+Browse requirements: [requirements/requirements.md](requirements/requirements.md)
 
-**Browse (static HTML):** [requirements report](requirements-html/html/index.html)
-
-**Browse (live server with edit UI):**
+**Live server (with edit UI):**
 ```
 .venv\Scripts\activate
 strictdoc server .
@@ -125,8 +121,8 @@ strictdoc server .
 Then open http://localhost:8080
 
 > Source files: `architecture/requirements/*.sdoc`
-> Every function ID from the Functional Breakdown has at least one FR in those files.
-> After manual edits via the server, run `strictdoc export . --output-dir architecture/requirements-html` and commit the result.
+> After editing requirements, run `python architecture/scripts/generate_requirements_md.py`
+> to regenerate the Markdown preview, then stage `architecture/requirements/requirements.md`.
 
 ---
 

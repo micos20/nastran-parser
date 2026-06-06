@@ -41,7 +41,7 @@ The dossier has five sections in this fixed order:
 1. **Actor/Action & Workflow** — who acts, what they do, and the stage-by-stage processing paths.
 2. **Logical Design** — pipeline boundary diagram. Image link to `diagrams/logical_design.svg`.
 3. **Functional Breakdown** — component hierarchy diagram. Image link to `diagrams/functional_breakdown.svg`.
-4. **Requirements** — link to the committed StrictDoc HTML export (`requirements-html/html/index.html`) and live-server instructions. No embedded requirement text.
+4. **Requirements** — link to `requirements/requirements.md` (generated Markdown preview) and live-server instructions. No embedded requirement text.
 5. **Physical Design** — placeholder until module structure stabilises.
 
 To start a new dossier from scratch: read `references/dossier-template.md` and write it to `architecture/architectural_dossier.md`.
@@ -59,7 +59,7 @@ When asked to create or extend the architectural dossier, drive this 10-step int
 5. **Draft Logical Design component diagram** — Invoke the `plantuml` skill. Read `references/diagram-conventions.md`. Show the draft `@startuml` block for user review **before** writing the file. External sources/sinks outside the `package` boundary; internal stages inside. On user approval: write `architecture/diagrams/logical_design.puml` — the hook auto-exports `logical_design.svg`. Then add the image link to the dossier's `## Logical Design` section.
 6. **Derive component IDs** — Propose `ABBREV-N` IDs for each leaf function under each stage. Confirm abbreviations with the user.
 7. **Draft Functional Breakdown WBS diagram** — Invoke the `plantuml` skill. Read `references/diagram-conventions.md`. Show the draft `@startwbs` block for review. Leaf nodes use `***_` (no box, stacked vertically). On approval: write `architecture/diagrams/functional_breakdown.puml` — hook exports `functional_breakdown.svg`. Add image link to dossier's `## Functional Breakdown` section.
-8. **Draft functional requirements per function ID** — Read `references/sdoc-grammar.md`. For each function ID in the approved WBS (in WBS order), scan `architecture/requirements/functional_requirements.sdoc` for any existing `[REQUIREMENT]` whose `FUNCTIONS` field includes that ID. Present proposals grouped by stage — mark existing FRs as `(existing) UID — TITLE`; for uncovered functions propose all mandatory fields (TITLE, STATEMENT, ACCEPTANCE_CRITERIA, MEANS_OF_COMPLIANCE). Ask: "Reply with (a) approve all, (b) edit specific items, or (c) add additional requirements." On approval: write new `[REQUIREMENT]` blocks to `functional_requirements.sdoc` (fresh UUID, next sequential UID, `STATUS: DRAFT`; never modify existing FRs). The PostToolUse hook auto-runs `strictdoc export . --output-dir architecture/requirements-html` after the `.sdoc` write — confirm HTML was generated. Then add the `## Requirements` section to the dossier (link to `requirements-html/html/index.html` + live-server instructions). Commit `architecture/requirements-html/html/` alongside the `.sdoc` change.
+8. **Draft functional requirements per function ID** — Read `references/sdoc-grammar.md`. For each function ID in the approved WBS (in WBS order), scan `architecture/requirements/functional_requirements.sdoc` for any existing `[REQUIREMENT]` whose `FUNCTIONS` field includes that ID. Present proposals grouped by stage — mark existing FRs as `(existing) UID — TITLE`; for uncovered functions propose all mandatory fields (TITLE, STATEMENT, ACCEPTANCE_CRITERIA, MEANS_OF_COMPLIANCE). Ask: "Reply with (a) approve all, (b) edit specific items, or (c) add additional requirements." On approval: write new `[REQUIREMENT]` blocks to `functional_requirements.sdoc` (fresh UUID, next sequential UID, `STATUS: DRAFT`; never modify existing FRs). Then run `python architecture/scripts/generate_requirements_md.py` and confirm `architecture/requirements/requirements.md` was updated. Add the `## Requirements` section to the dossier (link to `requirements/requirements.md` + live-server instructions). Stage both the `.sdoc` file and `requirements.md` for the user to commit.
 9. **Non-functional properties** — "Are there known NFR properties: performance, memory, distribution, modularity?" Seeds NFR requirements.
 10. **Physical Design** — Leave as placeholder; note in the dossier that diagrams will be added once module structure stabilises.
 
@@ -118,19 +118,15 @@ StrictDoc server: `.venv\Scripts\activate` then `strictdoc server .` → `http:/
 
 ---
 
-## Requirements Auto-Export
+## Requirements Markdown
 
-After Claude writes or edits any `.sdoc` file the PostToolUse hook runs:
+After Claude writes or edits any `.sdoc` file, run:
 ```
-strictdoc export . --output-dir architecture/requirements-html
+python architecture/scripts/generate_requirements_md.py
 ```
-This regenerates `architecture/requirements-html/html/`. The dossier's `## Requirements` section links to `requirements-html/html/index.html`.
+This regenerates `architecture/requirements/requirements.md`. Stage both files together for the user to commit.
 
-The `architecture/requirements-html/html/` directory is committed to git so all developers and repo viewers can browse requirements without running a server. The `_cache/` subdirectory inside `requirements-html/` is gitignored.
-
-After manual edits via the StrictDoc server or direct `.sdoc` file edits:
-1. Run `strictdoc export . --output-dir architecture/requirements-html` (venv activated).
-2. Commit the updated `architecture/requirements-html/html/` alongside the `.sdoc` change.
+The dossier's `## Requirements` section links to `requirements/requirements.md`, which renders natively on GitHub and in VS Code without a server.
 
 ---
 

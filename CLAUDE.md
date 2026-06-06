@@ -20,9 +20,11 @@ nastran-parser/
 
 ## Git workflow
 
-**Never commit changes.** Prepare and stage changes, then stop and let the user
-commit. Do not run `git commit` under any circumstances, even if asked to "save"
-or "apply" work. Summarise what is staged and wait for the user to commit.
+Do not stage or commit changes on your own. When you finish making file changes,
+summarise what you changed and stop — let the user decide when to commit.
+
+**Exception:** When the `/commit` skill (`workflow:commit`) is active, you are
+explicitly authorised to stage files, run `git commit`, and push to the remote.
 
 ## Architecture workflow
 
