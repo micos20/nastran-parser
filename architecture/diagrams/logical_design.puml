@@ -1,0 +1,30 @@
+@startuml logical_design
+
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor<<optional>> #EEEEEE
+    BorderStyle<<optional>> dashed
+}
+
+[FileSystemSource] as SRC
+[NetworkSource] as NET
+
+package "nastran-parser" {
+    [Interpreter] as INT
+    [Analyzer] as ANL
+    [Renumberer] <<optional>> as RNB
+    [Exporter] as EXP
+}
+
+[FileSystemSink] as FSINK
+[NetworkSink] as NSINK
+
+SRC --> INT : "text lines"
+NET --> INT : "text lines"
+INT --> ANL : "Card"
+ANL --> RNB : "Card"
+RNB --> EXP : "Card"
+EXP --> FSINK : "text lines"
+EXP --> NSINK : "text lines"
+
+@enduml

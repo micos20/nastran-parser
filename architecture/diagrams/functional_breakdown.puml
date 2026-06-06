@@ -1,0 +1,18 @@
+@startwbs functional_breakdown
+* nastran-parser
+** interpreter
+***_ INT-1  assemble text lines
+***_ INT-2  detect format
+***_ INT-3  instantiate models + validate
+** analyzer
+***_ ANL-1  count cards
+***_ ANL-2  determine ranges
+***_ ANL-3  prepare summary
+** renumberer
+***_ RNB-1  assign ranges
+***_ RNB-2  update ID field
+***_ RNB-3  populate lookup
+** exporter
+***_ EXP-1  serialize models
+***_ EXP-2  pass through unknowns
+@endwbs

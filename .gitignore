@@ -12,5 +12,7 @@ wheels/
 # strictdoc
 output/
 
-# claude code
+# claude code — ignore personal overrides and local state, track shared skills
 .claude/
+!.claude/skills/
+!.claude/skills/**

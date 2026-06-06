@@ -91,64 +91,17 @@ Pipeline stages (inside nastran-parser boundary):
 > required-field checks, value constraints) is embedded inside the Interpreter at model-construction
 > time. There is no separate runtime stage. The Excalidraw source should be updated to reflect this.
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'clusterBkg': '#ffffff', 'clusterBorder': '#000000', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
-flowchart TD
-    FS["FileSystemSource"]
-    NS["NetworkSource"]
+![Logical Design](diagrams/logical_design.svg)
 
-    subgraph np["nastran-parser"]
-        IF["Interpreter"]
-        SS["Analyzer"]
-        RF["Renumberer\n(renumber task only)"]:::opt
-        EF["Exporter"]
-    end
-
-    FSink["FileSystemSink"]
-    NSink["NetworkSink"]
-
-    FS -->|"text lines"| IF
-    NS -->|"text lines"| IF
-    IF -->|"Card"| SS
-    SS -->|"Card"| RF
-    RF -->|"Card"| EF
-    EF -->|"text lines"| FSink
-    EF -->|"text lines"| NSink
-
-    classDef opt stroke-dasharray: 5 5
-```
+<!-- Source: architecture/diagrams/logical_design.puml — edit the source; SVG re-exports automatically on save. -->
 
 ---
 
 ## Functional Breakdown
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'clusterBkg': '#ffffff', 'clusterBorder': '#000000', 'lineColor': '#000000', 'textColor': '#000000'}}}%%
-flowchart TD
-    NP["nastran-parser"]
+![Functional Breakdown](diagrams/functional_breakdown.svg)
 
-    INT["interpreter"]
-    ANL["analyzer"]
-    RNB["renumberer"]
-    EXP["exporter"]
-
-    NP --> INT & ANL & RNB & EXP
-
-    INT --> INT1["INT-1  assemble raw text lines\ninto complete cards"]
-    INT --> INT2["INT-2  detect card format\n(small / large / free-field)"]
-    INT --> INT3["INT-3  instantiate typed card models\n(field extraction + type validation)"]
-
-    ANL --> ANL1["ANL-1  count cards by type"]
-    ANL --> ANL2["ANL-2  determine numbering ranges\nper card type"]
-    ANL --> ANL3["ANL-3  prepare file summary"]
-
-    RNB --> RNB1["RNB-1  assign new numbering ranges\nbased on ruleset"]
-    RNB --> RNB2["RNB-2  update card ID field"]
-    RNB --> RNB3["RNB-3  populate old→new\nID lookup table"]
-
-    EXP --> EXP1["EXP-1  serialise card models\nback to BDF text lines"]
-    EXP --> EXP2["EXP-2  pass through\nunknown card types unchanged"]
-```
+<!-- Source: architecture/diagrams/functional_breakdown.puml — edit the source; SVG re-exports automatically on save. -->
 
 > The **analyzer** runs on every BDF read. It profiles the file — counting cards and recording
 > the ID ranges currently in use per card type — so the `FileSummary` is complete and usable
@@ -158,4 +111,4 @@ flowchart TD
 
 ## Physical Design
 
-*Diagrams will be added as Excalidraw exports. Source files in `architecture/diagrams/`.*
+*Diagrams will be added as PlantUML exports from `architecture/diagrams/` once the module structure stabilises.*

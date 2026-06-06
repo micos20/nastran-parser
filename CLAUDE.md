@@ -8,7 +8,7 @@ nastran-parser/
 ├── tests/                    # pytest tests (mirrors src/ tree)
 ├── architecture/
 │   ├── requirements/         # StrictDoc .sdoc files (FR-, NFR-)
-│   ├── diagrams/             # Excalidraw source files (.excalidraw)
+│   ├── diagrams/             # PlantUML source files (.puml) + generated SVGs
 │   └── architectural_dossier.md  # main architecture document
 ├── strictdoc_config.py       # StrictDoc project config
 └── pyproject.toml            # all Python project config (tools, deps, metadata)
@@ -18,32 +18,11 @@ nastran-parser/
 - Dev dependencies are declared in `[dependency-groups] dev` in `pyproject.toml`.
 - Python minimum: 3.12. `match`/`case` is available and preferred for card-type dispatch.
 
-## Working with StrictDoc requirements
+## Architecture workflow
 
-**Browse:** activate the venv (`.venv\Scripts\activate`), then run `strictdoc server .` from the repo root. Opens on http://localhost:8080.
-
-**Before implementing** any feature (new card type, format variant, mutation behavior, write-back option), locate or create the corresponding requirement UID in `architecture/requirements/`.
-
-- Functional requirements: `architecture/requirements/functional_requirements.sdoc` (prefix `FR-`)
-- Non-functional requirements: `architecture/requirements/nonfunctional_requirements.sdoc` (prefix `NFR-`)
-- Add new requirements to the `.sdoc` files; use the next available UID in sequence.
-- Reference a UID in code only when the mapping is non-obvious (module docstring or single inline comment).
-
-## Working with diagrams
-
-Mermaid diagrams are embedded directly in `architecture/architectural_dossier.md`
-using fenced ` ```mermaid ... ``` ` blocks. These are the authoritative diagrams.
-Excalidraw files in `architecture/diagrams/` are used for sketching only and are
-not the source of truth.
-
-Do not edit Mermaid blocks manually unless correcting a rendering issue.
-
-### Module name consistency
-
-The **Logical Design** diagram and the **Functional Breakdown** diagram are related.
-The module names used in both diagrams must always be identical. Whenever a module
-name is added, removed, or renamed in one diagram, apply the same change to the other
-diagram and the surrounding prose in the same commit.
+Use the `architecture-design` skill for all work involving the architectural dossier,
+StrictDoc requirements, or diagrams. It contains the complete three-artifact workflow
+guide, the StrictDoc field reference, and diagram conventions (PlantUML + SVG).
 
 ## Testing standards
 
