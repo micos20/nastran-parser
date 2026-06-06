@@ -11,6 +11,7 @@ wheels/
 
 # strictdoc
 output/
+architecture/requirements-html/_cache/
 
 # claude code — ignore personal overrides and local state, track shared skills
 .claude/

@@ -109,6 +109,27 @@ Pipeline stages (inside nastran-parser boundary):
 
 ---
 
+## Requirements
+
+Requirements are maintained in `architecture/requirements/` using StrictDoc.
+The static HTML export is committed at `architecture/requirements-html/html/` and
+regenerates automatically whenever Claude edits a `.sdoc` file (PostToolUse hook).
+
+**Browse (static HTML):** [requirements report](requirements-html/html/index.html)
+
+**Browse (live server with edit UI):**
+```
+.venv\Scripts\activate
+strictdoc server .
+```
+Then open http://localhost:8080
+
+> Source files: `architecture/requirements/*.sdoc`
+> Every function ID from the Functional Breakdown has at least one FR in those files.
+> After manual edits via the server, run `strictdoc export . --output-dir architecture/requirements-html` and commit the result.
+
+---
+
 ## Physical Design
 
 *Diagrams will be added as PlantUML exports from `architecture/diagrams/` once the module structure stabilises.*
