@@ -18,6 +18,12 @@ nastran-parser/
 - Dev dependencies are declared in `[dependency-groups] dev` in `pyproject.toml`.
 - Python minimum: 3.12. `match`/`case` is available and preferred for card-type dispatch.
 
+## Git workflow
+
+**Never commit changes.** Prepare and stage changes, then stop and let the user
+commit. Do not run `git commit` under any circumstances, even if asked to "save"
+or "apply" work. Summarise what is staged and wait for the user to commit.
+
 ## Architecture workflow
 
 Use the `architecture-design` skill for all work involving the architectural dossier,
