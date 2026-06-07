@@ -2,7 +2,7 @@
 
 > Auto-generated — do not edit directly.
 > Source: `architecture/requirements/*.sdoc`
-> To update: run `python .claude/skills/architecture-design/scripts/generate_requirements_md.py`
+> To update: run `python .claude\skills\architecture-design\scripts\generate_requirements_md.py`
 > Live edit UI: `.venv\Scripts\activate` then `strictdoc server .` → http://localhost:8080
 
 ---

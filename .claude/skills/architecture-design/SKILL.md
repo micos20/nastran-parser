@@ -56,16 +56,20 @@ When asked to create or extend the architectural dossier, drive this 10-step int
 2. **Actors and actions** — "Who are the actors? System-only or user + system? List all actions the system performs." Produces the Actor/Action table.
 3. **Workflows stage-by-stage** — "Walk me through each workflow. What are the named stages?" One `#### Workflow N` subsection per flow. Offer to draft if the user is unsure.
 4. **Derive logical pipeline stages** — Summarise: "From these workflows I see these logical stages: X, Y, Z. Does that match?" Confirm before proceeding.
-5. **Draft Logical Design component diagram** — Invoke the `plantuml` skill. Read `references/diagram-conventions.md`. Show the draft `@startuml` block for user review **before** writing the file. External sources/sinks outside the `package` boundary; internal stages inside. On user approval: write `architecture/diagrams/logical_design.puml`, then run `python .claude/skills/architecture-design/scripts/export_puml.py architecture/diagrams/logical_design.puml` to produce `logical_design.svg`. Then add the image link to the dossier's `## Logical Design` section.
+5. **Draft Logical Design component diagram** — Invoke the `plantuml` skill. Read `references/diagram-conventions.md`. Show the draft `@startuml` block for user review **before** writing the file. External sources/sinks outside the `package` boundary; internal stages inside. On user approval: write `architecture/diagrams/logical_design.puml`, then run `python "$SKILL_DIR/scripts/export_puml.py architecture/diagrams/logical_design.puml` to produce `logical_design.svg`. Then add the image link to the dossier's `## Logical Design` section.
 6. **Derive component IDs** — Propose `ABBREV-N` IDs for each leaf function under each stage. Confirm abbreviations with the user.
-7. **Draft Functional Breakdown WBS diagram** — Invoke the `plantuml` skill. Read `references/diagram-conventions.md`. Show the draft `@startwbs` block for review. Leaf nodes use `***_` (no box, stacked vertically). On approval: write `architecture/diagrams/functional_breakdown.puml`, then run `python .claude/skills/architecture-design/scripts/export_puml.py architecture/diagrams/functional_breakdown.puml` to produce `functional_breakdown.svg`. Add image link to dossier's `## Functional Breakdown` section.
-8. **Draft functional requirements per function ID** — Read `references/sdoc-grammar.md`. For each function ID in the approved WBS (in WBS order), scan `architecture/requirements/functional_requirements.sdoc` for any existing `[REQUIREMENT]` whose `FUNCTIONS` field includes that ID. Present proposals grouped by stage — mark existing FRs as `(existing) UID — TITLE`; for uncovered functions propose all mandatory fields (TITLE, STATEMENT, ACCEPTANCE_CRITERIA, MEANS_OF_COMPLIANCE). Ask: "Reply with (a) approve all, (b) edit specific items, or (c) add additional requirements." On approval: write new `[REQUIREMENT]` blocks to `functional_requirements.sdoc` (fresh UUID, next sequential UID, `STATUS: DRAFT`; never modify existing FRs). Then run `python .claude/skills/architecture-design/scripts/generate_requirements_md.py` and confirm `architecture/requirements/requirements.md` was updated. Add the `## Requirements` section to the dossier (link to `requirements/requirements.md` + live-server instructions). Stage both the `.sdoc` file and `requirements.md` for the user to commit.
+7. **Draft Functional Breakdown WBS diagram** — Invoke the `plantuml` skill. Read `references/diagram-conventions.md`. Show the draft `@startwbs` block for review. Leaf nodes use `***_` (no box, stacked vertically). On approval: write `architecture/diagrams/functional_breakdown.puml`, then run `python "$SKILL_DIR/scripts/export_puml.py architecture/diagrams/functional_breakdown.puml` to produce `functional_breakdown.svg`. Add image link to dossier's `## Functional Breakdown` section.
+8. **Draft functional requirements per function ID** — Read `references/sdoc-grammar.md`. For each function ID in the approved WBS (in WBS order), scan `architecture/requirements/functional_requirements.sdoc` for any existing `[REQUIREMENT]` whose `FUNCTIONS` field includes that ID. Present proposals grouped by stage — mark existing FRs as `(existing) UID — TITLE`; for uncovered functions propose all mandatory fields (TITLE, STATEMENT, ACCEPTANCE_CRITERIA, MEANS_OF_COMPLIANCE). Ask: "Reply with (a) approve all, (b) edit specific items, or (c) add additional requirements." On approval: write new `[REQUIREMENT]` blocks to `functional_requirements.sdoc` (fresh UUID, next sequential UID, `STATUS: DRAFT`; never modify existing FRs). Then run `python "$SKILL_DIR/scripts/generate_requirements_md.py` and confirm `architecture/requirements/requirements.md` was updated. Add the `## Requirements` section to the dossier (link to `requirements/requirements.md` + live-server instructions). Stage both the `.sdoc` file and `requirements.md` for the user to commit.
 9. **Non-functional properties** — "Are there known NFR properties: performance, memory, distribution, modularity?" Seeds NFR requirements.
 10. **Physical Design** — Leave as placeholder; note in the dossier that diagrams will be added once module structure stabilises.
 
 ---
 
 ## PlantUML Diagram Workflow
+
+> **`$SKILL_DIR`** is this skill's base directory. When activated via the Claude Code
+> Skill tool, the harness injects it as **"Base directory for this skill: `<path>`"**
+> at the top of the skill content. Substitute that path wherever you see `$SKILL_DIR`.
 
 **Before writing any `.puml` content:**
 1. Invoke the `plantuml` skill.
@@ -77,7 +81,7 @@ When asked to create or extend the architectural dossier, drive this 10-step int
 After writing a `.puml` file, run the export command:
 
 ```
-python .claude/skills/architecture-design/scripts/export_puml.py architecture/diagrams/<file>.puml
+python "$SKILL_DIR/scripts/export_puml.py architecture/diagrams/<file>.puml
 ```
 
 This produces the SVG in the same directory. To regenerate all diagrams, pass `--all`.
@@ -100,7 +104,7 @@ When a stage name changes:
 2. Update `functional_breakdown.puml` (the `**` entry).
 3. Update component IDs if the abbreviation changes — also update all `FUNCTIONS` field values in every `.sdoc` file that reference the old component IDs.
 4. Update any prose in the dossier that names the stage.
-5. Run `python .claude/skills/architecture-design/scripts/export_puml.py --all` to regenerate both SVGs.
+5. Run `python "$SKILL_DIR/scripts/export_puml.py --all` to regenerate both SVGs.
 6. All changes go in the same commit.
 
 See `references/diagram-conventions.md` for the step-by-step procedure.
@@ -128,7 +132,7 @@ StrictDoc server: `.venv\Scripts\activate` then `strictdoc server .` → `http:/
 
 After Claude writes or edits any `.sdoc` file, run:
 ```
-python .claude/skills/architecture-design/scripts/generate_requirements_md.py
+python "$SKILL_DIR/scripts/generate_requirements_md.py
 ```
 This regenerates `architecture/requirements/requirements.md`. Stage both files together for the user to commit.
 

@@ -1,22 +1,26 @@
 """Generate architecture/requirements/requirements.md from .sdoc source files."""
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
-_NEW_SCRIPT_PATH = ".claude/skills/architecture-design/scripts/generate_requirements_md.py"
-
 
 def _find_project_root(start: Path) -> Path:
+    markers = ("pyproject.toml", "package.json", "Cargo.toml", "go.mod", ".git")
     for p in [start, *start.parents]:
-        if (p / "pyproject.toml").exists():
+        if any((p / m).exists() for m in markers):
             return p
-    raise FileNotFoundError("pyproject.toml not found — run from within the project tree")
+    raise FileNotFoundError(
+        "Could not find project root — run the script from within a project directory"
+    )
 
 
-PROJECT_ROOT = _find_project_root(Path(__file__).resolve())
+PROJECT_ROOT = _find_project_root(Path.cwd())
 REQUIREMENTS_DIR = PROJECT_ROOT / "architecture" / "requirements"
 OUTPUT_FILE = REQUIREMENTS_DIR / "requirements.md"
+
+_SCRIPT_REL = os.path.relpath(Path(__file__).resolve(), Path.cwd())
 
 _BLOCK_RE = re.compile(r"^\[(\w+)\]$")
 _FIELD_RE = re.compile(r"^(\w+):\s*(.*)")
@@ -93,7 +97,7 @@ def generate_markdown(docs: list[tuple[str, list[dict[str, str]]]]) -> str:
         "",
         "> Auto-generated — do not edit directly.",
         "> Source: `architecture/requirements/*.sdoc`",
-        f"> To update: run `python {_NEW_SCRIPT_PATH}`",
+        f"> To update: run `python {_SCRIPT_REL}`",
         "> Live edit UI: `.venv\\Scripts\\activate` then `strictdoc server .` → http://localhost:8080",
         "",
     ]
