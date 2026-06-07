@@ -4,9 +4,18 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-ARCHITECTURE_DIR = SCRIPT_DIR.parent
-REQUIREMENTS_DIR = ARCHITECTURE_DIR / "requirements"
+_NEW_SCRIPT_PATH = ".claude/skills/architecture-design/scripts/generate_requirements_md.py"
+
+
+def _find_project_root(start: Path) -> Path:
+    for p in [start, *start.parents]:
+        if (p / "pyproject.toml").exists():
+            return p
+    raise FileNotFoundError("pyproject.toml not found — run from within the project tree")
+
+
+PROJECT_ROOT = _find_project_root(Path(__file__).resolve())
+REQUIREMENTS_DIR = PROJECT_ROOT / "architecture" / "requirements"
 OUTPUT_FILE = REQUIREMENTS_DIR / "requirements.md"
 
 _BLOCK_RE = re.compile(r"^\[(\w+)\]$")
@@ -84,7 +93,7 @@ def generate_markdown(docs: list[tuple[str, list[dict[str, str]]]]) -> str:
         "",
         "> Auto-generated — do not edit directly.",
         "> Source: `architecture/requirements/*.sdoc`",
-        "> To update: run `python architecture/scripts/generate_requirements_md.py`",
+        f"> To update: run `python {_NEW_SCRIPT_PATH}`",
         "> Live edit UI: `.venv\\Scripts\\activate` then `strictdoc server .` → http://localhost:8080",
         "",
     ]
@@ -143,7 +152,7 @@ def main() -> None:
             docs.append((title, reqs))
 
     OUTPUT_FILE.write_text(generate_markdown(docs), encoding="utf-8")
-    print(f"Written: {OUTPUT_FILE.relative_to(ARCHITECTURE_DIR.parent)}")
+    print(f"Written: {OUTPUT_FILE.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":

@@ -121,7 +121,7 @@ strictdoc server .
 Then open http://localhost:8080
 
 > Source files: `architecture/requirements/*.sdoc`
-> After editing requirements, run `python architecture/scripts/generate_requirements_md.py`
+> After editing requirements, run `python .claude/skills/architecture-design/scripts/generate_requirements_md.py`
 > to regenerate the Markdown preview, then stage `architecture/requirements/requirements.md`.
 
 ---
